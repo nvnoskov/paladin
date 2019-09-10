@@ -1,0 +1,62 @@
+image: golang:latest
+
+variables:
+  REPO_NAME: kurs.kz/paladin
+  GIT_SUBMODULE_STRATEGY: recursive
+
+before_script:
+  - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
+  - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
+  - cd $GOPATH/src/$REPO_NAME
+  - go get -u -t github.com/tinylib/msgp
+  - go get -u -t github.com/dgraph-io/badger
+  - go get -u -t github.com/savsgio/atreugo
+  - go get -u -t github.com/sirupsen/logrus
+
+
+stages:
+    - test
+    - build
+
+format:
+    stage: test
+    script:
+      - go fmt $(go list ./... | grep -v /vendor/)
+      - go vet $(go list ./... | grep -v /vendor/)
+      - go test -race $(go list ./... | grep -v /vendor/)
+      - CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o build/paladin
+      - cp /etc/ssl/certs/ca-certificates.crt build/ca-certificates.crt
+    artifacts:
+      paths:
+        - build/
+
+build-master:
+  # Official docker image.
+  image: docker:latest
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - ln -svf $CI_PROJECT_DIR/build /go
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
+    - docker push "$CI_REGISTRY_IMAGE"
+  only:
+    - master
+
+
+build-develop:
+  # Official docker image.
+  image: docker:latest
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
+  only:
+    - tags
+

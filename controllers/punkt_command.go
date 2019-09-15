@@ -77,9 +77,9 @@ func SyncPunkts(ctx *atreugo.RequestCtx) error {
 	wb := db.DB.NewWriteBatch()
 	defer wb.Cancel()
 
-	for k, punkt := range punkts {
+	for _, punkt := range punkts {
 
-		fmt.Printf("key[%d] value[%v]\n", k, punkt)
+		// fmt.Printf("key[%d] value[%v]\n", k, punkt)
 		key = []byte(fmt.Sprintf("punkt-%d", punkt.ID))
 
 		data, _ := punkt.MarshalMsg(nil)

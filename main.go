@@ -52,7 +52,7 @@ func main() {
 	logrus.Infof("Starting badgerCleanupProc...")
 	go db.BadgerCleanupProc()
 
-	logrus.Infof("Database ready! Starting HTTP server at %d...",
+	logrus.Infof("Database ready! Starting HTTP server at %s...",
 		listenAddr)
 
 	config := atreugo.Config{

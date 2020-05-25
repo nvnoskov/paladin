@@ -2848,13 +2848,13 @@ func (z *Map) DecodeMsg(dc *msgp.Reader) (err error) {
 		}
 		switch msgp.UnsafeString(field) {
 		case "Lat":
-			z.Lat, err = dc.ReadString()
+			z.Lat, err = dc.ReadFloat64()
 			if err != nil {
 				err = msgp.WrapError(err, "Lat")
 				return
 			}
 		case "Lng":
-			z.Lng, err = dc.ReadString()
+			z.Lng, err = dc.ReadFloat64()
 			if err != nil {
 				err = msgp.WrapError(err, "Lng")
 				return
@@ -2878,7 +2878,7 @@ func (z Map) EncodeMsg(en *msgp.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	err = en.WriteString(z.Lat)
+	err = en.WriteFloat64(z.Lat)
 	if err != nil {
 		err = msgp.WrapError(err, "Lat")
 		return
@@ -2888,7 +2888,7 @@ func (z Map) EncodeMsg(en *msgp.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	err = en.WriteString(z.Lng)
+	err = en.WriteFloat64(z.Lng)
 	if err != nil {
 		err = msgp.WrapError(err, "Lng")
 		return
@@ -2902,10 +2902,10 @@ func (z Map) MarshalMsg(b []byte) (o []byte, err error) {
 	// map header, size 2
 	// string "Lat"
 	o = append(o, 0x82, 0xa3, 0x4c, 0x61, 0x74)
-	o = msgp.AppendString(o, z.Lat)
+	o = msgp.AppendFloat64(o, z.Lat)
 	// string "Lng"
 	o = append(o, 0xa3, 0x4c, 0x6e, 0x67)
-	o = msgp.AppendString(o, z.Lng)
+	o = msgp.AppendFloat64(o, z.Lng)
 	return
 }
 
@@ -2928,13 +2928,13 @@ func (z *Map) UnmarshalMsg(bts []byte) (o []byte, err error) {
 		}
 		switch msgp.UnsafeString(field) {
 		case "Lat":
-			z.Lat, bts, err = msgp.ReadStringBytes(bts)
+			z.Lat, bts, err = msgp.ReadFloat64Bytes(bts)
 			if err != nil {
 				err = msgp.WrapError(err, "Lat")
 				return
 			}
 		case "Lng":
-			z.Lng, bts, err = msgp.ReadStringBytes(bts)
+			z.Lng, bts, err = msgp.ReadFloat64Bytes(bts)
 			if err != nil {
 				err = msgp.WrapError(err, "Lng")
 				return
@@ -2953,7 +2953,7 @@ func (z *Map) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z Map) Msgsize() (s int) {
-	s = 1 + 4 + msgp.StringPrefixSize + len(z.Lat) + 4 + msgp.StringPrefixSize + len(z.Lng)
+	s = 1 + 4 + msgp.Float64Size + 4 + msgp.Float64Size
 	return
 }
 
@@ -3165,13 +3165,13 @@ func (z *Punkt) DecodeMsg(dc *msgp.Reader) (err error) {
 				}
 				switch msgp.UnsafeString(field) {
 				case "Lat":
-					z.Map.Lat, err = dc.ReadString()
+					z.Map.Lat, err = dc.ReadFloat64()
 					if err != nil {
 						err = msgp.WrapError(err, "Map", "Lat")
 						return
 					}
 				case "Lng":
-					z.Map.Lng, err = dc.ReadString()
+					z.Map.Lng, err = dc.ReadFloat64()
 					if err != nil {
 						err = msgp.WrapError(err, "Map", "Lng")
 						return
@@ -3412,9 +3412,13 @@ func (z *Punkt) EncodeMsg(en *msgp.Writer) (err error) {
 		return
 	}
 	// write "Workattr"
+	err = en.Append(0xa8, 0x57, 0x6f, 0x72, 0x6b, 0x61, 0x74, 0x74, 0x72)
+	if err != nil {
+		return
+	}
 	// map header, size 3
 	// write "Nonstop"
-	err = en.Append(0xa8, 0x57, 0x6f, 0x72, 0x6b, 0x61, 0x74, 0x74, 0x72, 0x83, 0xa7, 0x4e, 0x6f, 0x6e, 0x73, 0x74, 0x6f, 0x70)
+	err = en.Append(0x83, 0xa7, 0x4e, 0x6f, 0x6e, 0x73, 0x74, 0x6f, 0x70)
 	if err != nil {
 		return
 	}
@@ -3444,13 +3448,17 @@ func (z *Punkt) EncodeMsg(en *msgp.Writer) (err error) {
 		return
 	}
 	// write "Map"
-	// map header, size 2
-	// write "Lat"
-	err = en.Append(0xa3, 0x4d, 0x61, 0x70, 0x82, 0xa3, 0x4c, 0x61, 0x74)
+	err = en.Append(0xa3, 0x4d, 0x61, 0x70)
 	if err != nil {
 		return
 	}
-	err = en.WriteString(z.Map.Lat)
+	// map header, size 2
+	// write "Lat"
+	err = en.Append(0x82, 0xa3, 0x4c, 0x61, 0x74)
+	if err != nil {
+		return
+	}
+	err = en.WriteFloat64(z.Map.Lat)
 	if err != nil {
 		err = msgp.WrapError(err, "Map", "Lat")
 		return
@@ -3460,7 +3468,7 @@ func (z *Punkt) EncodeMsg(en *msgp.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	err = en.WriteString(z.Map.Lng)
+	err = en.WriteFloat64(z.Map.Lng)
 	if err != nil {
 		err = msgp.WrapError(err, "Map", "Lng")
 		return
@@ -3554,9 +3562,10 @@ func (z *Punkt) MarshalMsg(b []byte) (o []byte, err error) {
 		return
 	}
 	// string "Workattr"
+	o = append(o, 0xa8, 0x57, 0x6f, 0x72, 0x6b, 0x61, 0x74, 0x74, 0x72)
 	// map header, size 3
 	// string "Nonstop"
-	o = append(o, 0xa8, 0x57, 0x6f, 0x72, 0x6b, 0x61, 0x74, 0x74, 0x72, 0x83, 0xa7, 0x4e, 0x6f, 0x6e, 0x73, 0x74, 0x6f, 0x70)
+	o = append(o, 0x83, 0xa7, 0x4e, 0x6f, 0x6e, 0x73, 0x74, 0x6f, 0x70)
 	o = msgp.AppendBool(o, z.Workattr.Nonstop)
 	// string "Closed"
 	o = append(o, 0xa6, 0x43, 0x6c, 0x6f, 0x73, 0x65, 0x64)
@@ -3565,13 +3574,14 @@ func (z *Punkt) MarshalMsg(b []byte) (o []byte, err error) {
 	o = append(o, 0xa7, 0x57, 0x6f, 0x72, 0x6b, 0x6e, 0x6f, 0x77)
 	o = msgp.AppendBool(o, z.Workattr.Worknow)
 	// string "Map"
+	o = append(o, 0xa3, 0x4d, 0x61, 0x70)
 	// map header, size 2
 	// string "Lat"
-	o = append(o, 0xa3, 0x4d, 0x61, 0x70, 0x82, 0xa3, 0x4c, 0x61, 0x74)
-	o = msgp.AppendString(o, z.Map.Lat)
+	o = append(o, 0x82, 0xa3, 0x4c, 0x61, 0x74)
+	o = msgp.AppendFloat64(o, z.Map.Lat)
 	// string "Lng"
 	o = append(o, 0xa3, 0x4c, 0x6e, 0x67)
-	o = msgp.AppendString(o, z.Map.Lng)
+	o = msgp.AppendFloat64(o, z.Map.Lng)
 	// string "Mainsort"
 	o = append(o, 0xa8, 0x4d, 0x61, 0x69, 0x6e, 0x73, 0x6f, 0x72, 0x74)
 	o = msgp.AppendInt(o, z.Mainsort)
@@ -3786,13 +3796,13 @@ func (z *Punkt) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				}
 				switch msgp.UnsafeString(field) {
 				case "Lat":
-					z.Map.Lat, bts, err = msgp.ReadStringBytes(bts)
+					z.Map.Lat, bts, err = msgp.ReadFloat64Bytes(bts)
 					if err != nil {
 						err = msgp.WrapError(err, "Map", "Lat")
 						return
 					}
 				case "Lng":
-					z.Map.Lng, bts, err = msgp.ReadStringBytes(bts)
+					z.Map.Lng, bts, err = msgp.ReadFloat64Bytes(bts)
 					if err != nil {
 						err = msgp.WrapError(err, "Map", "Lng")
 						return
@@ -3829,7 +3839,7 @@ func (z *Punkt) Msgsize() (s int) {
 	for za0001 := range z.Phones {
 		s += msgp.StringPrefixSize + len(z.Phones[za0001])
 	}
-	s += 5 + msgp.IntSize + 5 + msgp.IntSize + 5 + z.Data.Msgsize() + 4 + msgp.StringPrefixSize + len(z.Lat) + 4 + msgp.StringPrefixSize + len(z.Lng) + 5 + msgp.BoolSize + 7 + msgp.BoolSize + 11 + msgp.IntSize + 10 + z.Workmodes.Msgsize() + 9 + 1 + 8 + msgp.BoolSize + 7 + msgp.BoolSize + 8 + msgp.BoolSize + 4 + 1 + 4 + msgp.StringPrefixSize + len(z.Map.Lat) + 4 + msgp.StringPrefixSize + len(z.Map.Lng) + 9 + msgp.IntSize
+	s += 5 + msgp.IntSize + 5 + msgp.IntSize + 5 + z.Data.Msgsize() + 4 + msgp.StringPrefixSize + len(z.Lat) + 4 + msgp.StringPrefixSize + len(z.Lng) + 5 + msgp.BoolSize + 7 + msgp.BoolSize + 11 + msgp.IntSize + 10 + z.Workmodes.Msgsize() + 9 + 1 + 8 + msgp.BoolSize + 7 + msgp.BoolSize + 8 + msgp.BoolSize + 4 + 1 + 4 + msgp.Float64Size + 4 + msgp.Float64Size + 9 + msgp.IntSize
 	return
 }
 

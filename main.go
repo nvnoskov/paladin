@@ -5,7 +5,7 @@ import (
 	_ "net/http/pprof"
 	"runtime"
 
-	"github.com/savsgio/atreugo"
+	"github.com/savsgio/atreugo/v11"
 	"github.com/sirupsen/logrus"
 	"kurs.kz/paladin/cache"
 	"kurs.kz/paladin/controllers"
@@ -13,14 +13,14 @@ import (
 )
 
 var databasePath string
-var listenAddr int
+var listenAddr string
 var verboseLogging bool
 var profile bool
 
 func main() {
 	flag.StringVar(&databasePath, "database", "./database",
 		"Path to the database")
-	flag.IntVar(&listenAddr, "listen", 8000,
+	flag.StringVar(&listenAddr, "listen", ":8000",
 		"Listen address")
 	flag.BoolVar(&verboseLogging, "verbose", true,
 		"Enable verbose logging")
@@ -55,16 +55,17 @@ func main() {
 	logrus.Infof("Database ready! Starting HTTP server at %d...",
 		listenAddr)
 
-	config := &atreugo.Config{
-		Host: "0.0.0.0",
-		Port: listenAddr,
+	config := atreugo.Config{
+		Addr: listenAddr,		
 	}
 	server := atreugo.New(config)
 
-	server.NewGroupPath("/punkts").Path("POST", "/", controllers.SyncPunkts)
-	server.NewGroupPath("/punkts").Path("PUT", "/:id?", controllers.UpdatePunkt)
-	server.NewGroupPath("/punkts").Path("GET", "/", controllers.GetPunkts)
-	server.NewGroupPath("/punkts").Path("GET", "/:id", controllers.GetPunkt)
+	punkts:=server.NewGroupPath("/punkts")
+	punkts.POST("/", controllers.SyncPunkts)
+	punkts.PUT("/{id}", controllers.UpdatePunkt)
+	punkts.POST("/{id}", controllers.UpdatePunktData)	
+	punkts.GET("/", controllers.GetPunkts)	
+	punkts.GET("/{id}", controllers.GetPunkt)
 	server.Path("GET", "/stats", func(ctx *atreugo.RequestCtx) error {
 		stats := cache.PaladinCache.Stats()
 		return ctx.JSONResponse(stats)

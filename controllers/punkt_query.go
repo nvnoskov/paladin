@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 
-	"kurs.kz/paladin/cache"
+	// "kurs.kz/paladin/cache"
 
-	"github.com/dgraph-io/badger"
-	"github.com/savsgio/atreugo"
+	"github.com/dgraph-io/badger/v2"
+	"github.com/savsgio/atreugo/v11"
 	"kurs.kz/paladin/db"
 	"kurs.kz/paladin/models"
 )
@@ -20,7 +20,6 @@ GetPunkt save punkt object to the budger store
 */
 func GetPunkt(ctx *atreugo.RequestCtx) error {
 	id := ctx.UserValue("id")
-
 	var punkt models.Punkt
 
 	if id == nil {
@@ -74,7 +73,7 @@ func GetPunkts(ctx *atreugo.RequestCtx) error {
 	// 	return err
 	// })
 	// if err == nil {
-	if cache.PaladinCache.Has("punkts") == true {
+	// if cache.PaladinCache.Has("punkts") == true {
 		// json.Unmarshal([]byte(cache.Value), &punkts)
 		// for k := range _cachedPunkts {
 		// 	_cachedPunkts[k].ActualTime = 0
@@ -86,9 +85,9 @@ func GetPunkts(ctx *atreugo.RequestCtx) error {
 		// start := []byte("{ \"punkts\": ")
 		// val := append(start, _cachedPunktsString...)
 		// val = append(val, test...)
-		ctx.SetContentType("application/json")
-		return ctx.TextResponseBytes(cache.PaladinCache.Get("punkts"))
-	}
+	// 	ctx.SetContentType("application/json")
+	// 	return ctx.TextResponseBytes(cache.PaladinCache.Get("punkts"))
+	// }
 	var punkt models.Punkt
 	err = db.DB.View(func(txn *badger.Txn) error {
 		it := txn.NewIterator(badger.DefaultIteratorOptions)
@@ -140,8 +139,8 @@ func GetPunkts(ctx *atreugo.RequestCtx) error {
 			"status":  400,
 		}, 400)
 	}
-	_cachedPunkts = punkts
-	_cachedPunktsString, _ = json.Marshal(punkts)
-	cache.PaladinCache.Set("punkts", _cachedPunktsString)
+	// _cachedPunkts = punkts
+	// _cachedPunktsString, _ = json.Marshal(punkts)
+	// cache.PaladinCache.Set("punkts", _cachedPunktsString)
 	return ctx.JSONResponse(punkts)
 }

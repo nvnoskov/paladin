@@ -111,8 +111,8 @@ type Workattr struct {
 Map descibes app collection in MongoDB
 */
 type Map struct {
-	Lat string `json:"lat"`
-	Lng string `json:"lng"`
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
 }
 
 /*
@@ -127,6 +127,22 @@ func (v *Punkt) Marshal() ([]byte, error) {
 Unmarshal JSON data to Punkt structure
 */
 func (v *Punkt) Unmarshal(data []byte) error {
+	err := json.Unmarshal(data, v)
+	return err
+}
+
+/*
+Marshal Data structure to JSON
+*/
+func (v *Data) Marshal() ([]byte, error) {
+	res, err := json.Marshal(v)
+	return res, err
+}
+
+/*
+Unmarshal JSON data to Data structure
+*/
+func (v *Data) Unmarshal(data []byte) error {
 	err := json.Unmarshal(data, v)
 	return err
 }

@@ -140,8 +140,7 @@ func SyncPunkts(ctx *atreugo.RequestCtx) error {
 		}, 400)
 	}
 
-	var key []byte
-
+	var key []byte	
 	wb := db.DB.NewWriteBatch()
 	defer wb.Cancel()
 
@@ -151,8 +150,10 @@ func SyncPunkts(ctx *atreugo.RequestCtx) error {
 		key = []byte(fmt.Sprintf("punkt-%d", punkt.ID))
 
 		data, _ := punkt.MarshalMsg(nil)
+		e := badger.NewEntry(key, data).WithTTL(time.Hour*24)  		
 
-		_ = wb.Set(key, data) // Will create txns as needed.
+		_ = wb.SetEntry(e)
+		// _ = wb.Set(key, data) // Will create txns as needed.
 	}
 
 	wb.Flush() // Wait for all txns to finish.

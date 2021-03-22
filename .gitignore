@@ -12,4 +12,5 @@
 *.out
 vendor/
 build/
-database
+database/
+paladin.exe

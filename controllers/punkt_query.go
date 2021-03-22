@@ -57,37 +57,9 @@ func GetPunkt(ctx *atreugo.RequestCtx) error {
 
 func GetPunkts(ctx *atreugo.RequestCtx) error {
 
-	// var cache models.Cache
-	// cacheKey := []byte("cache-punkts")
 	var punkts []models.Punkt
 	var err error
-	// err := db.DB.View(func(txn *badger.Txn) error {
-	// 	item, err := txn.Get(cacheKey)
-	// 	if err != nil {
-	// 		return err
-	// 	}
 
-	// 	value, err := item.ValueCopy(nil)
-	// 	value, err = cache.UnmarshalMsg(value)
-
-	// 	return err
-	// })
-	// if err == nil {
-	// if cache.PaladinCache.Has("punkts") == true {
-		// json.Unmarshal([]byte(cache.Value), &punkts)
-		// for k := range _cachedPunkts {
-		// 	_cachedPunkts[k].ActualTime = 0
-		// }
-
-		// return ctx.JSONResponse(_cachedPunkts)
-		//[]byte("{ \"punkts\": ")[:], , []byte("\", \"delta\":1}")
-		// test := []byte(", \"delta\":1}")
-		// start := []byte("{ \"punkts\": ")
-		// val := append(start, _cachedPunktsString...)
-		// val = append(val, test...)
-	// 	ctx.SetContentType("application/json")
-	// 	return ctx.TextResponseBytes(cache.PaladinCache.Get("punkts"))
-	// }
 	var punkt models.Punkt
 	err = db.DB.View(func(txn *badger.Txn) error {
 		it := txn.NewIterator(badger.DefaultIteratorOptions)
@@ -107,40 +79,12 @@ func GetPunkts(ctx *atreugo.RequestCtx) error {
 		return nil
 	})
 
-	// jsonString, _ := json.Marshal(punkts)
-	// cache.Value = string(jsonString)
-	// err = db.DB.Update(func(txn *badger.Txn) error {
-
-	// 	data, err := cache.MarshalMsg(nil)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	return txn.Set(cacheKey, data)
-	// })
-	// var value []byte
-	// err := db.DB.View(func(txn *badger.Txn) error {
-
-	// 	item, err := txn.Get([]byte(key))
-	// 	if err != nil {
-	// 		return err
-	// 	}
-
-	// 	value, err = item.ValueCopy(nil)
-	// 	value, err = punkt.UnmarshalMsg(value)
-
-	// 	fmt.Printf("value: %+v err: %+v", value, err)
-
-	// 	return err
-	// })
-
 	if err != nil {
 		return ctx.JSONResponse(map[string]interface{}{
 			"message": fmt.Sprintf("%s", err),
 			"status":  400,
 		}, 400)
 	}
-	// _cachedPunkts = punkts
-	// _cachedPunktsString, _ = json.Marshal(punkts)
-	// cache.PaladinCache.Set("punkts", _cachedPunktsString)
+
 	return ctx.JSONResponse(punkts)
 }

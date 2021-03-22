@@ -50,22 +50,16 @@ func UpdatePunktData(ctx *atreugo.RequestCtx) error {
 		value, err = punkt.UnmarshalMsg(value)
 		punkt.Data = data
 		err = db.DB.Update(func(txn *badger.Txn) error {
-			// item, err := txn.Get([]byte(key))
-			// if err != nil {
-			// 	return err
-			// }
 			dataToSave, err := punkt.MarshalMsg(nil)
 			if err != nil {
 				return err
 			}
-	
-			e := badger.NewEntry(key, dataToSave).WithTTL(time.Hour*24)  		
+
+			e := badger.NewEntry(key, dataToSave).WithTTL(time.Hour * 24)
 			return txn.SetEntry(e)
 		})
 		return err
 	})
-
-	
 
 	if err != nil {
 		return ctx.JSONResponse(map[string]interface{}{
@@ -76,6 +70,7 @@ func UpdatePunktData(ctx *atreugo.RequestCtx) error {
 	// cache.PaladinCache.Remove("punkts")
 	return ctx.JSONResponse(punkt)
 }
+
 /*
 UpdatePunkt save punkt object to the budger store
 Uses POST
@@ -110,7 +105,7 @@ func UpdatePunkt(ctx *atreugo.RequestCtx) error {
 			return err
 		}
 
-		e := badger.NewEntry(key, data).WithTTL(time.Hour*24)  		
+		e := badger.NewEntry(key, data).WithTTL(time.Hour * 24)
 
 		return txn.SetEntry(e)
 	})
@@ -140,20 +135,18 @@ func SyncPunkts(ctx *atreugo.RequestCtx) error {
 		}, 400)
 	}
 
-	var key []byte	
+	var key []byte
 	wb := db.DB.NewWriteBatch()
 	defer wb.Cancel()
 
 	for _, punkt := range punkts {
 
-		// fmt.Printf("key[%d] value[%v]\n", k, punkt)
 		key = []byte(fmt.Sprintf("punkt-%d", punkt.ID))
 
 		data, _ := punkt.MarshalMsg(nil)
-		e := badger.NewEntry(key, data).WithTTL(time.Hour*24)  		
+		e := badger.NewEntry(key, data).WithTTL(time.Hour * 24)
 
 		_ = wb.SetEntry(e)
-		// _ = wb.Set(key, data) // Will create txns as needed.
 	}
 
 	wb.Flush() // Wait for all txns to finish.
